@@ -2,7 +2,9 @@ import sys
 from pygame import *
 
 init()
+
 ## Carregamento de recursos 
+
 cachorro_imagem = image.load('cachorro.png')
 cachorro_imagem = transform.scale(cachorro_imagem, (150,150))
 
@@ -11,14 +13,14 @@ manha = mixer.Sound('manha.mp3')
 tarde = mixer.Sound('tarde.mp3')
 noite = mixer.Sound('noite.mp3')
  
- 
- #para rodar : variavel.play()
 
 window = display.set_mode((1280,720))
 running = True
 clock = time.Clock()
 
+
 ##Definição de variáveis
+
 nuvem_x = 300
 nuvem_y = 75
 background_color = (152, 209, 250)
@@ -31,6 +33,7 @@ while running:
     clock.tick(60)
 
     ##UPDATE
+
     dt = clock.get_time()/1000
     keys = key.get_pressed()
 
@@ -41,6 +44,7 @@ while running:
             running = False
 
         #AÇOES INSTANTANEAS
+
         if ev.type == KEYDOWN:
             key_pressed = ev.key
             if key_pressed == K_x:
@@ -66,13 +70,14 @@ while running:
 
 
     # Nuvem não pode sair da tela
+
     if indo_direita == 0:
         nuvem_x = nuvem_x + 100 * dt
     else:
         nuvem_x = nuvem_x - 100 * dt
     
     if nuvem_x+120+40 > 1280:
-       indo_direita = indo_direita+1
+       indo_direita+=1
     if nuvem_x-40 < 0:
         indo_direita = 0
 
@@ -89,7 +94,7 @@ while running:
 
     # Mudar a cor de fundo e mudar o sfx que toca se botão esquerdo do mouse é apertado
 
-    if 0<sol_x<426:
+    if 0<=sol_x<426:
         background_color = (250, 212, 100) 
         if ev.type == MOUSEBUTTONUP:
             if ev.button == 1:
