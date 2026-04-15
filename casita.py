@@ -7,24 +7,34 @@ cachorro_imagem = image.load('cachorro.png')
 cachorro_imagem = transform.scale(cachorro_imagem, (150,150))
 
 cachorro_font = font.Font('Somelist.ttf', 50)
-
-mixer.music.load('Fluffing-a-Duck(chosic.com).mp3')
-mixer.music.play(-1)
+manha = mixer.Sound('manha.mp3')
+tarde = mixer.Sound('tarde.mp3')
+noite = mixer.Sound('noite.mp3')
+ 
+ 
+ #para rodar : variavel.play()
 
 window = display.set_mode((1280,720))
 running = True
 clock = time.Clock()
 
-
 ##Definição de variáveis
-pos_x = 300
-pos_y = 75
+nuvem_x = 300
+nuvem_y = 75
 background_color = (152, 209, 250)
 indo_direita = 0
-
+estado = 0
+sol_x = 70
+sol_y = 70
 
 while running:
     clock.tick(60)
+
+    ##UPDATE
+    dt = clock.get_time()/1000
+    keys = key.get_pressed()
+
+    mouse_x,mouse_y = mouse.get_pos()
 
     for ev in event.get():
         if ev.type == QUIT:
@@ -33,41 +43,83 @@ while running:
         #AÇOES INSTANTANEAS
         if ev.type == KEYDOWN:
             key_pressed = ev.key
-            if key_pressed == K_SPACE:
-                background_color = (245,178,64)
+            if key_pressed == K_x:
+                if estado == 0:
+                    estado+=1
+                elif estado == 1:
+                    estado = 0
+        
+    ## APERTAR TECLA [X] PARA MUDAR O ESTADO DO SOL (MOUSE OU TECLADO)
 
+        if estado == 1:
+            sol_x=mouse_x
+            sol_y=mouse_y
+        if estado == 0:
+            if keys[K_d]:
+                sol_x = sol_x + 500 * dt
+            if keys[K_a]:
+                sol_x = sol_x - 500 * dt
+            if keys[K_w]:
+                sol_y = sol_y - 500 * dt
+            if keys[K_s]:
+                sol_y = sol_y + 500 * dt
 
-    ##UPDATE
-    dt = clock.get_time()/1000
-    keys = key.get_pressed()
 
     # Nuvem não pode sair da tela
     if indo_direita == 0:
-        pos_x = pos_x + 100 * dt
+        nuvem_x = nuvem_x + 100 * dt
     else:
-        pos_x = pos_x - 100 * dt
+        nuvem_x = nuvem_x - 100 * dt
     
-    if pos_x+120+40 > 1280:
+    if nuvem_x+120+40 > 1280:
        indo_direita = indo_direita+1
-    if pos_x-40 < 0:
+    if nuvem_x-40 < 0:
         indo_direita = 0
-    
 
-    #Pressionar teclas
-    #ACOES CONTINUAS
-    #if keys[K_d]:
-    #    pos_x = pos_x + 100 * dt
-    #if keys[K_a]:
-    #    pos_x = pos_x - 100 * dt
-    #if keys[K_w]:
-    #    pos_y = pos_y - 100 * dt
-    #if keys[K_s]:
-    #    pos_y = pos_y + 100 * dt
-    
+    # Sol não pode sair da tela
+
+    if sol_x-100<=0:
+        sol_x = 100
+    if sol_x+100>=1280:
+        sol_x = 1180
+    if sol_y-100<=0:
+        sol_y = 100
+    if sol_y+100>=720:
+        sol_y = 620
+
+    # Mudar a cor de fundo e mudar o sfx que toca se botão esquerdo do mouse é apertado
+
+    if 0<sol_x<426:
+        background_color = (250, 212, 100) 
+        if ev.type == MOUSEBUTTONUP:
+            if ev.button == 1:
+                manha.play()
+    elif sol_x<853:
+        background_color = (100, 220, 250)
+        if ev.type == MOUSEBUTTONUP:
+            if ev.button == 1:
+                tarde.play()
+    elif sol_x<=1280:
+        background_color = (41, 30, 7)
+        if ev.type == MOUSEBUTTONUP:
+            if ev.button == 1:
+                noite.play()
+
     #Desenhar a partir daqui
 
     #Desenhar primitivas geometricas
     window.fill(background_color)
+
+    #Sol
+    draw.circle(window, (255,255,0), (sol_x,sol_y), 50)
+    draw.line(window, (255,255,0),(sol_x,sol_y),(sol_x+100,sol_y), 5)
+    draw.line(window, (255,255,0),(sol_x,sol_y),(sol_x,sol_y+100), 5)
+    draw.line(window, (255,255,0),(sol_x,sol_y),(sol_x+80,sol_y+90), 7)
+    draw.line(window, (255,255,0),(sol_x,sol_y),(sol_x+90,sol_y-40), 7)   
+    draw.line(window, (255,255,0),(sol_x,sol_y),(sol_x,sol_y-100), 5) 
+    draw.line(window, (255,255,0),(sol_x,sol_y),(sol_x-100,sol_y), 5) 
+    draw.line(window, (255,255,0),(sol_x,sol_y),(sol_x-90,sol_y-90), 7) 
+    draw.line(window, (255,255,0),(sol_x,sol_y),(sol_x-90,sol_y+80), 7) 
 
     #Casa
     draw.rect(window, (50, 168, 70), (0, 550, 1280, 300))
@@ -82,23 +134,10 @@ while running:
     draw.circle(window, (20, 107, 2), (915,350), 100)
 
     #Nuvem
-    draw.circle(window, (255,255,255), (pos_x,75), 40)
-    draw.circle(window, (255,255,255), (pos_x + 40,75), 40)
-    draw.circle(window, (255,255,255), (pos_x + 80,75), 40)
-    draw.circle(window, (255,255,255), (pos_x + 120,75), 40)
-
-    #Nuvem não pode sair da tela
-
-    #if pos_x>=1280 or pos_x<=0:
-    #    pos_x=0
-    
-    #Sol
-    draw.circle(window, (255,255,0), (70,70), 50)
-    draw.line(window, (255,255,0),(70, 70),(150,70), 5)
-    draw.line(window, (255,255,0),(70, 70),(70,150), 5)
-    draw.line(window, (255,255,0),(70, 70),(140,140), 5)
-    draw.line(window, (255,255,0),(70, 70),(140,30), 5)   
-    
+    draw.circle(window, (255,255,255), (nuvem_x,75), 40)
+    draw.circle(window, (255,255,255), (nuvem_x + 40,75), 40)
+    draw.circle(window, (255,255,255), (nuvem_x + 80,75), 40)
+    draw.circle(window, (255,255,255), (nuvem_x + 120,75), 40)
     
     #Desenhar imagens 
     window.blit(cachorro_imagem, (500,420))
